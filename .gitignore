@@ -1,0 +1,20 @@
+# Node
+node_modules/
+dist/
+
+# Env / secrets
+.env
+.env.* 
+
+# Runtime / data
+data/*.json
+
+# Logs
+*.log
+logs/
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
