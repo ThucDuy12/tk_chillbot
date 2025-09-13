@@ -1,4 +1,3 @@
-// src/index.js
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
@@ -38,7 +37,7 @@ const client = new Client({
 });
 
 // create axios instance
-const http = axios.create({ timeout: 15000 });
+const httpClient = axios.create({ timeout: 15000 });
 
 // Helpers
 function memberHasAnyRole(member, roleNames = []) {
@@ -160,7 +159,7 @@ async function handleCommand(interaction) {
     await interaction.deferReply();
     const icao = interaction.options.getString('icao', true).toUpperCase();
     try {
-      const res = await http.get(`https://metar-taf.com/json?icao=${icao}`);
+      const res = await httpClient.get(`https://metar-taf.com/json?icao=${icao}`);
       const data = res.data;
       if (!data || !data.raw) return interaction.followUp({ content: `:x: Không tìm thấy METAR cho ${icao}` });
       const embed = new EmbedBuilder()
@@ -478,7 +477,7 @@ async function vatsimTick() {
     const state = loadJson(VATSIM_FILE, {});
     let data;
     try {
-      const res = await http.get('https://data.vatsim.net/v3/vatsim-data.json');
+      const res = await httpClient.get('https://data.vatsim.net/v3/vatsim-data.json');
       data = res.data;
     } catch (e) {
       console.error('vatsim fetch error', e.message);
@@ -604,11 +603,12 @@ client.once('ready', async () => {
   setInterval(reminderTick, 60 * 1000); // 1 min
   reminderTick().catch(e=>console.error(e));
 });
+
 // Minimal HTTP server so Render sees an open port (works for Web Service type)
-const http = require('http');
+const httpServer = require('http');
 const port = process.env.PORT || 3000;
 
-const server = http.createServer((req, res) => {
+const server = httpServer.createServer((req, res) => {
   if (req.url === '/healthz') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     return res.end('ok');
@@ -620,4 +620,5 @@ const server = http.createServer((req, res) => {
 server.listen(port, () => {
   console.log(`HTTP server listening on port ${port}`);
 });
+
 client.login(TOKEN);
